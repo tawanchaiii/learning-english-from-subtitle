@@ -1,0 +1,169 @@
+%% assessment.tex.j2 — Assessment Report PDF (CS188 exam style)
+
+<% include 'common.tex.j2' %>
+
+\begin{document}
+
+%% ===== COVER PAGE =====
+\thispagestyle{empty}
+
+\noindent
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{\Large Assessment Report}\\[0.3em]
+\textbf{\large {{ movie_name }}}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\raggedleft
+Learner Level: {{ learner_cefr }}\\
+Assessment Date: {{ assessment_date }}\\
+Overall Score: \textbf{ {{ overall_score }}/{{ overall_total }} ({{ overall_percent }}\%)}
+\end{minipage}
+
+\vspace{2em}
+
+\section*{Score Summary}
+
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Part} & \textbf{Score} & \textbf{Visual} \\
+\hline
+<% for part in score_parts %>
+{{ part.label }} & {{ part.score }}/{{ part.total }} & \scorebar{ {{ part.score }} }{ {{ part.total }} } \\
+\hline
+<% endfor %>
+\textbf{Overall} & \textbf{ {{ overall_score }}/{{ overall_total }} } & \scorebar{ {{ overall_score }} }{ {{ overall_total }} } \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+%% ===== PART A & B: DETAILED RESULTS =====
+\section*{Part A: Vocabulary --- Detailed Results ({{ part_a_score }}/{{ part_a_total }})}
+
+<% for q in part_a_results %>
+\noindent\textbf{ {{ q.id }} } {{ q.prompt }}\\
+Your answer: \textbf{ {{ q.learner_answer }} } \hfill
+Correct answer: \textbf{ {{ q.correct_answer }} } \hfill
+<% if q.is_correct %>$\checkmark$ Correct<% else %>$\times$ Incorrect<% endif %>
+
+<% if not q.is_correct %>
+\begin{tcolorbox}[answerbox]
+\textit{ {{ q.explanation }} }
+\end{tcolorbox}
+\vspace{0.3em}
+<% endif %>
+
+<% endfor %>
+
+\section*{Part B: Comprehension --- Detailed Results ({{ part_b_score }}/{{ part_b_total }})}
+
+<% for q in part_b_results %>
+\noindent\textbf{ {{ q.id }} } {{ q.prompt }}\\
+Your answer: \textbf{ {{ q.learner_answer }} } \hfill
+Correct answer: \textbf{ {{ q.correct_answer }} } \hfill
+<% if q.is_correct %>$\checkmark$ Correct<% else %>$\times$ Incorrect<% endif %>
+
+<% if not q.is_correct %>
+\begin{tcolorbox}[answerbox]
+\textit{ {{ q.explanation }} }
+\end{tcolorbox}
+\vspace{0.3em}
+<% endif %>
+
+<% endfor %>
+
+%% ===== PART C: SUBJECTIVE FEEDBACK =====
+\newpage
+\section*{Part C: Subjective Writing --- Detailed Feedback ({{ part_c_score }}/{{ part_c_total }})}
+
+<% for q in part_c_results %>
+\subsection*{ {{ q.id }} ({{ q.score }}/{{ q.max_score }}): {{ q.prompt }} }
+
+\noindent\textbf{Your answer:}
+\begin{tcolorbox}[answerbox]
+{{ q.learner_answer }}
+\end{tcolorbox}
+
+\vspace{0.5em}
+
+\noindent\textbf{Criteria scores:}
+\begin{itemize}[leftmargin=2em]
+<% for criterion in q.criteria_scores %>
+  \item \textbf{ {{ criterion.name }} } ({{ criterion.score }}/{{ criterion.max }}): {{ criterion.feedback }}
+<% endfor %>
+\end{itemize}
+
+<% if q.corrections %>
+\noindent\textbf{Corrections:}
+\begin{itemize}[leftmargin=2em]
+<% for correction in q.corrections %>
+  \item {{ correction }}
+<% endfor %>
+\end{itemize}
+<% endif %>
+
+<% if q.strengths %>
+\noindent\textbf{Strengths:}
+\begin{itemize}[leftmargin=2em]
+<% for strength in q.strengths %>
+  \item {{ strength }}
+<% endfor %>
+\end{itemize}
+<% endif %>
+
+\vspace{1em}
+<% endfor %>
+
+%% ===== PROFICIENCY ASSESSMENT =====
+\newpage
+\section*{Proficiency Assessment}
+
+\noindent\textbf{Estimated CEFR Level:} {{ estimated_cefr }}\\
+\textbf{Self-declared Level:} {{ learner_cefr }}\\
+\textbf{Comparison:} {{ cefr_comparison }}
+
+\vspace{1em}
+
+\noindent\textbf{Skill Breakdown:}
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Skill} & \textbf{Level} & \textbf{Assessment} \\
+\hline
+<% for skill in skill_breakdown %>
+{{ skill.name }} & {{ skill.level }} & {{ skill.assessment }} \\
+\hline
+<% endfor %>
+\end{tabular}
+\end{center}
+
+%% ===== PERSONALIZED STUDY PLAN =====
+\vspace{1.5em}
+\section*{Personalized Study Plan}
+
+\subsection*{Weak Areas to Focus On}
+\begin{itemize}[leftmargin=2em]
+<% for area in weak_areas %>
+  \item \textbf{ {{ area.topic }} }: {{ area.detail }}
+<% endfor %>
+\end{itemize}
+
+\subsection*{Recommended Practice}
+\begin{itemize}[leftmargin=2em]
+<% for rec in recommendations %>
+  \item {{ rec }}
+<% endfor %>
+\end{itemize}
+
+\subsection*{Suggested Next Movies}
+\begin{enumerate}[leftmargin=2em]
+<% for movie in suggested_movies %>
+  \item \textbf{ {{ movie.title }} } ({{ movie.cefr }}) --- {{ movie.reason }}
+<% endfor %>
+\end{enumerate}
+
+\end{document}

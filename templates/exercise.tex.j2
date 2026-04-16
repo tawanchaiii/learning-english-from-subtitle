@@ -1,0 +1,112 @@
+%% exercise.tex.j2 — Exercise PDF (CS188 exam style)
+
+<% include 'common.tex.j2' %>
+
+\begin{document}
+
+%% ===== COVER PAGE =====
+\thispagestyle{empty}
+
+\noindent
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{\Large English Exercise}\\[0.3em]
+\textbf{\large {{ movie_name }}}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\raggedleft
+Movie CEFR: {{ detected_cefr }}\\
+Your Level: {{ learner_cefr }}\\
+Date: {{ generated_date }}
+\end{minipage}
+
+\vspace{1.5em}
+
+\noindent Print Your Name: \rule{8cm}{0.4pt}
+
+\vspace{2em}
+
+\noindent There are 3 parts of varying credit. ({{ total_points }} points total)
+
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{|l|<% for part in parts %>c|<% endfor %>c|}
+\hline
+\textbf{Part} <% for part in parts %> & \textbf{ {{ part.label }} } <% endfor %> & \textbf{Total} \\
+\hline
+Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_points }} \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1.5em}
+
+\noindent\textit{For questions with circular bubbles, you may select only one choice.}
+
+\vspace{0.5em}
+\begin{itemize}[leftmargin=2em]
+  \item[\bubble{A}] Unselected option (completely unfilled)
+  \item[\filledbubble{C}] Your selected option (completely filled)
+\end{itemize}
+
+\vspace{1em}
+
+\noindent\textit{For subjective questions, write your answer clearly inside the answer box. Anything written outside the box will not be graded.}
+
+\vspace{1em}
+\noindent\rule{\textwidth}{0.5pt}
+
+\newpage
+
+%% ===== PART A: VOCABULARY (MULTIPLE CHOICE) =====
+\section*{Part A: Vocabulary ({{ part_a_points }} points)}
+
+<% for q in part_a_questions %>
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+
+\vspace{0.3em}
+\begin{itemize}[leftmargin=2em, label={}]
+<% for choice in q.choices %>
+  \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
+<% endfor %>
+\end{itemize}
+
+\vspace{1em}
+<% endfor %>
+
+%% ===== PART B: COMPREHENSION (MULTIPLE CHOICE) =====
+<% if part_b_needs_newpage %>\newpage<% endif %>
+\section*{Part B: Comprehension ({{ part_b_points }} points)}
+
+<% for q in part_b_questions %>
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+
+\vspace{0.3em}
+\begin{itemize}[leftmargin=2em, label={}]
+<% for choice in q.choices %>
+  \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
+<% endfor %>
+\end{itemize}
+
+\vspace{1em}
+<% endfor %>
+
+%% ===== PART C: SUBJECTIVE WRITING =====
+\newpage
+\section*{Part C: Subjective Writing ({{ part_c_points }} points)}
+
+<% for q in part_c_questions %>
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+
+\vspace{0.5em}
+\writingbox{ {{ q.box_height }} }
+
+<% if not loop.last %>
+\vspace{1.5em}
+<% endif %>
+
+<% if q.needs_newpage %>\newpage<% endif %>
+<% endfor %>
+
+\end{document}

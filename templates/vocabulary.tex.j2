@@ -1,0 +1,76 @@
+%% vocabulary.tex.j2 — Vocabulary List PDF (CS188 exam style)
+
+<% include 'common.tex.j2' %>
+
+\begin{document}
+
+%% ===== COVER PAGE =====
+\thispagestyle{empty}
+
+\noindent
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{\Large Vocabulary List}\\[0.3em]
+\textbf{\large {{ movie_name }}}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\raggedleft
+Movie CEFR: {{ detected_cefr }}\\
+Total Words: {{ total_words }}\\
+Date: {{ generated_date }}
+\end{minipage}
+
+\vspace{2em}
+
+\section*{CEFR Distribution}
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Level} & \textbf{Count} \\
+\hline
+<% for level in cefr_levels %>
+{{ level.name }} & {{ level.count }} \\
+\hline
+<% endfor %>
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+\section*{Recommended Study Order}
+
+\noindent Based on your level ({{ learner_cefr }}), focus on these words first:
+\begin{enumerate}[leftmargin=2em]
+<% for word in priority_words %>
+  \item \textbf{ {{ word }} }
+<% endfor %>
+\end{enumerate}
+
+\newpage
+
+%% ===== VOCABULARY TABLES BY CEFR LEVEL =====
+<% for level in cefr_sections %>
+\section*{[{{ level.name }}] --- {{ level.description }}}
+
+\noindent {{ level.count }} words
+
+\vspace{0.5em}
+
+\begin{longtable}{p{2.2cm} p{1.5cm} p{3cm} p{3.5cm} p{3.5cm}}
+\toprule
+\textbf{Word} & \textbf{POS} & \textbf{Meaning} & \textbf{Movie Example} & \textbf{Real-life Example} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+<% for word in level.words %>
+{{ word.word }} & {{ word.pos }} & {{ word.meaning }} & \textit{ {{ word.movie_example }} } & {{ word.real_life_example }} \\
+\midrule
+<% endfor %>
+\end{longtable}
+
+<% if not loop.last %>\newpage<% endif %>
+<% endfor %>
+
+\end{document}
