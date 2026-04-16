@@ -1,6 +1,7 @@
-import json
 import os
 import sys
+
+import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
@@ -54,3 +55,36 @@ def test_parse_srt_line_structure():
 def test_parse_srt_total_lines():
     result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.srt"))
     assert result["total_lines"] == 8
+
+
+def test_parse_vtt_returns_dict_with_required_keys():
+    result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.vtt"))
+    assert "filename" in result
+    assert "movie_name" in result
+    assert "format" in result
+    assert "total_lines" in result
+    assert "scenes" in result
+
+
+def test_parse_vtt_extracts_movie_name():
+    result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.vtt"))
+    assert result["movie_name"] == "sample"
+    assert result["format"] == "vtt"
+
+
+def test_parse_vtt_groups_scenes_same_as_srt():
+    """VTT and SRT with same content should produce same scene grouping."""
+    srt_result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.srt"))
+    vtt_result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.vtt"))
+    assert len(vtt_result["scenes"]) == len(srt_result["scenes"])
+    assert vtt_result["total_lines"] == srt_result["total_lines"]
+
+
+def test_parse_vtt_total_lines():
+    result = parse_subtitle(os.path.join(FIXTURES_DIR, "sample.vtt"))
+    assert result["total_lines"] == 8
+
+
+def test_parse_unsupported_format_raises():
+    with pytest.raises(ValueError, match="Unsupported subtitle format"):
+        parse_subtitle("movie.txt")
