@@ -112,10 +112,12 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 \section*{Part C: Subjective Writing ({{ part_c_points }} points)}
 
 <% for q in part_c_questions %>
+\noindent\begin{minipage}{\textwidth}
 \question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
 
 \vspace{0.5em}
 \writingbox{ {{ q.box_height }} }
+\end{minipage}
 
 <% if not loop.last %>
 \vspace{1.5em}
