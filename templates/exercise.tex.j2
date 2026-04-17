@@ -74,7 +74,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 \section*{Part A: Vocabulary ({{ part_a_points }} points)}
 
 <% for q in part_a_questions %>
-\begin{samepage}
+\noindent\begin{minipage}{\textwidth}
 \question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
 
 \vspace{0.3em}
@@ -83,7 +83,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
   \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
 <% endfor %>
 \end{itemize}
-\end{samepage}
+\end{minipage}
 
 \vspace{1em}
 <% endfor %>
@@ -93,7 +93,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 \section*{Part B: Comprehension ({{ part_b_points }} points)}
 
 <% for q in part_b_questions %>
-\begin{samepage}
+\noindent\begin{minipage}{\textwidth}
 \question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
 
 \vspace{0.3em}
@@ -102,7 +102,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
   \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
 <% endfor %>
 \end{itemize}
-\end{samepage}
+\end{minipage}
 
 \vspace{1em}
 <% endfor %>
