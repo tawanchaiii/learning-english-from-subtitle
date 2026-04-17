@@ -5,7 +5,6 @@
 
 % Encoding and fonts
 \usepackage{fontspec}
-\usepackage{unicode-math}
 
 % Page geometry
 \usepackage[
@@ -48,17 +47,17 @@
   }
 }
 
-% Custom commands for bubble choices (single select — circular)
+% Custom commands for choice labels (CS188 exam style — boxed letters)
 \usepackage{tikz}
 \newcommand{\bubble}[1]{%
   \tikz[baseline=(char.base)]{%
-    \node[shape=circle, draw, inner sep=1.5pt, minimum size=14pt] (char) {\textsf{#1}};%
+    \node[shape=rectangle, draw, rounded corners=1.5pt, inner sep=2pt, minimum size=12pt, line width=0.4pt] (char) {\small\textsf{#1}};%
   }%
 }
-% Filled bubble (for answer keys)
+% Filled label (for answer keys)
 \newcommand{\filledbubble}[1]{%
   \tikz[baseline=(char.base)]{%
-    \node[shape=circle, draw, fill=black, text=white, inner sep=1.5pt, minimum size=14pt] (char) {\textsf{#1}};%
+    \node[shape=rectangle, draw, rounded corners=1.5pt, fill=black, text=white, inner sep=2pt, minimum size=12pt, line width=0.4pt] (char) {\small\textsf{#1}};%
   }%
 }
 
@@ -83,14 +82,10 @@
 \titleformat{\section}{\large\bfseries}{}{0pt}{}[\vspace{-0.5em}\rule{\textwidth}{0.5pt}]
 \titleformat{\subsection}{\normalsize\bfseries}{}{0pt}{}
 
-% Lined writing area for subjective questions
+% Clean writing area for subjective questions (no lines)
 \newcommand{\writingbox}[1]{%
   \begin{tcolorbox}[answerbox, height=#1]
-    \foreach \i in {1,...,20}{%
-      \vfill
-      \noindent\rule{\linewidth}{0.2pt}%
-    }
-    \vfill
+    \mbox{}
   \end{tcolorbox}%
 }
 
