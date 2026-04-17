@@ -47,17 +47,17 @@
   }
 }
 
-% Custom commands for choice labels (CS188 exam style — boxed letters)
+% Custom commands for choice labels (symmetric circle with centered letter)
 \usepackage{tikz}
 \newcommand{\bubble}[1]{%
-  \tikz[baseline=(char.base)]{%
-    \node[shape=rectangle, draw, rounded corners=1.5pt, inner sep=2pt, minimum size=12pt, line width=0.4pt] (char) {\small\textsf{#1}};%
+  \tikz[baseline=-0.5ex]{%
+    \node[shape=circle, draw, line width=0.4pt, minimum size=1.6em, inner sep=0pt, font=\small\sffamily] {#1};%
   }%
 }
-% Filled label (for answer keys)
+% Filled circle (for answer keys)
 \newcommand{\filledbubble}[1]{%
-  \tikz[baseline=(char.base)]{%
-    \node[shape=rectangle, draw, rounded corners=1.5pt, fill=black, text=white, inner sep=2pt, minimum size=12pt, line width=0.4pt] (char) {\small\textsf{#1}};%
+  \tikz[baseline=-0.5ex]{%
+    \node[shape=circle, draw, line width=0.4pt, fill=black, text=white, minimum size=1.6em, inner sep=0pt, font=\small\sffamily] {#1};%
   }%
 }
 
