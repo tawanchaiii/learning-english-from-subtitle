@@ -22,6 +22,7 @@ Date: {{ generated_date }}
 
 \vspace{2em}
 
+\pdfbookmark[1]{CEFR Distribution}{cefrdist}
 \section*{CEFR Distribution}
 
 \begin{center}
@@ -38,6 +39,7 @@ Date: {{ generated_date }}
 
 \vspace{1em}
 
+\pdfbookmark[1]{Recommended Study Order}{studyorder}
 \section*{Recommended Study Order}
 
 \noindent Based on your level ({{ learner_cefr }}), focus on these words first:
@@ -51,6 +53,7 @@ Date: {{ generated_date }}
 
 %% ===== VOCABULARY TABLES BY CEFR LEVEL =====
 <% for level in cefr_sections %>
+\pdfbookmark[1]{[{{ level.name }}] {{ level.description }} ({{ level.count }} words)}{cefr_{{ level.name }}}
 \section*{[{{ level.name }}] --- {{ level.description }}}
 
 \noindent {{ level.count }} words

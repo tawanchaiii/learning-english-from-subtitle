@@ -71,6 +71,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 \newpage
 
 %% ===== PART A: VOCABULARY (MULTIPLE CHOICE) =====
+\pdfbookmark[1]{Part A: Vocabulary ({{ part_a_points }} pts)}{partA}
 \section*{Part A: Vocabulary ({{ part_a_points }} points)}
 
 <% for q in part_a_questions %>
@@ -90,6 +91,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 
 %% ===== PART B: COMPREHENSION (MULTIPLE CHOICE) =====
 <% if part_b_needs_newpage %>\newpage<% endif %>
+\pdfbookmark[1]{Part B: Comprehension ({{ part_b_points }} pts)}{partB}
 \section*{Part B: Comprehension ({{ part_b_points }} points)}
 
 <% for q in part_b_questions %>
@@ -109,6 +111,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 
 %% ===== PART C: SUBJECTIVE WRITING =====
 \newpage
+\pdfbookmark[1]{Part C: Subjective Writing ({{ part_c_points }} pts)}{partC}
 \section*{Part C: Subjective Writing ({{ part_c_points }} points)}
 
 <% for q in part_c_questions %>
