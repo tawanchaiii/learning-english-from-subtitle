@@ -50,14 +50,14 @@
 % Custom commands for choice labels (tight circle, CS188 exam style)
 \usepackage{tikz}
 \newcommand{\bubble}[1]{%
-  \tikz[baseline=-0.5ex]{%
-    \node[shape=circle, draw, line width=0.3pt, minimum size=0.9em, inner sep=0.5pt, font=\tiny\sffamily] {#1};%
+  \tikz[baseline=(char.base)]{%
+    \node[circle, draw, line width=0.3pt, minimum size=1.4ex, inner sep=1pt, font=\scriptsize\sffamily, text height=1.1ex, text depth=0.1ex] (char) {#1};%
   }%
 }
 % Filled circle (for answer keys)
 \newcommand{\filledbubble}[1]{%
-  \tikz[baseline=-0.5ex]{%
-    \node[shape=circle, draw, line width=0.3pt, fill=black, text=white, minimum size=0.9em, inner sep=0.5pt, font=\tiny\sffamily] {#1};%
+  \tikz[baseline=(char.base)]{%
+    \node[circle, draw, line width=0.3pt, fill=black, text=white, minimum size=1.4ex, inner sep=1pt, font=\scriptsize\sffamily, text height=1.1ex, text depth=0.1ex] (char) {#1};%
   }%
 }
 
