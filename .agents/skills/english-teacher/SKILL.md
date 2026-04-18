@@ -42,6 +42,11 @@ python3 scripts/parse_subtitle.py <subtitle-file>
 
 Save the output to `output/<movie-name>/scenes.json`.
 
+The parsed scenes JSON includes scene metadata with timestamps:
+- `scene_id`: e.g., "scene_14"
+- `start_time`: e.g., "00:15:30"
+- `end_time`: e.g., "00:18:45"
+
 ### Step 2: Analyze Content and Auto-Detect CEFR Level
 
 Read the parsed scenes JSON. Analyze the subtitle content to determine the movie's CEFR level:
@@ -80,6 +85,28 @@ For each question, also generate the guideline data:
 - Multiple choice: correct answer + explanation
 - Subjective: rubric with weighted criteria (content_accuracy, grammar_and_structure, vocabulary_usage, expression_and_depth), key_points, common_errors_to_check, and look_for hints
 
+**IMPORTANT: Scene References with Timestamps**
+
+When referencing scenes in questions, ALWAYS include the timestamp:
+- Format: `scene_N [HH:MM:SS]` 
+- Example: `"scene_ref": "scene_14 [00:15:30]"`
+
+This helps students locate the exact scene when watching the movie.
+
+**Supplementary Context with Exa MCP**
+
+If the subtitle content alone is insufficient to create quality exercises (e.g., historical references, cultural context, ambiguous dialogue), use Exa MCP to search for additional context:
+
+```bash
+# Example: Search for context about a historical reference in the movie
+# Use exa_web_search_exa or exa_web_search_advanced_exa to find relevant information
+```
+
+When using Exa MCP:
+- Search for background information relevant to the movie's themes or historical references
+- Use results to create more accurate questions and explanations
+- Always cite that supplementary research was used in the explanation if applicable
+
 Adjust difficulty based on the learner's level:
 - Lower levels: simpler vocabulary choices, more context clues, shorter writing prompts
 - Higher levels: nuanced distractors, less context, deeper analysis expected
@@ -88,7 +115,7 @@ Adjust difficulty based on the learner's level:
 
 Extract interesting vocabulary from the subtitles:
 - Tag each word with its CEFR level (A1/A2/B1/B2/C1/C2)
-- Include: word, part of speech, meaning, movie example (actual quote), real-life example (you create this), scene reference
+- Include: word, part of speech, meaning, movie example (actual quote), real-life example (you create this), scene reference with timestamp
 - Include idioms and phrasal verbs
 - Select words that are useful for general English learning, not ultra-niche jargon
 
@@ -132,7 +159,7 @@ Write the complete guideline to `output/<movie-name>/<movie-name>-guideline.json
           "id": "C1",
           "type": "scene_summary",
           "prompt": "Summarize the scene where...",
-          "scene_ref": "scene_14",
+          "scene_ref": "scene_14 [00:15:30]",
           "scene_dialogue": ["Jack: Close your eyes.", "Rose: I trust you."],
           "rubric": {
             "max_score": 10,
@@ -172,7 +199,7 @@ Write the complete guideline to `output/<movie-name>/<movie-name>-guideline.json
       "meaning": "front part of a ship",
       "movie_example": "\"I'm the king of the world!\" (at the bow)",
       "real_life_example": "The passengers gathered at the bow to watch the sunset.",
-      "scene_ref": "scene_14"
+      "scene_ref": "scene_14 [00:15:30]"
     }
   ]
 }
@@ -371,3 +398,21 @@ All PDFs use CS188 UC Berkeley exam style:
 - xelatex not installed: provide install instructions
 - docling-mcp not configured: provide setup instructions
 - Subtitle too short (<50 lines): warn that exercise quality may be limited, proceed anyway
+
+## Available Tools
+
+**Subtitle Parsing:**
+- `python3 scripts/parse_subtitle.py <file>` — Parse .srt/.vtt to scenes.json with timestamps
+
+**Internet Search (Exa MCP):**
+When subtitle context is insufficient, use these tools for supplementary research:
+- `exa_web_search_exa` — Quick web search for movie/historical context
+- `exa_web_search_advanced_exa` — Advanced search with filters for detailed research
+
+**LaTeX Rendering:**
+- `python3 scripts/render_latex.py <template.j2> <data.json> <output.tex>` — Render Jinja2 template with data
+- `bash scripts/compile_pdf.sh <file.tex>` — Compile .tex to PDF (runs xelatex twice for page refs)
+
+**MCP Servers:**
+- docling-mcp — PDF text extraction for assess mode
+- Ensure any required MCP servers are configured in your environment
