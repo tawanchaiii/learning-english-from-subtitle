@@ -76,12 +76,12 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 
 <% for q in part_a_questions %>
 \noindent\begin{minipage}{\textwidth}
-\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt | escape_latex }} }
 
 \vspace{0.3em}
 \begin{itemize}[leftmargin=2em, label={}]
 <% for choice in q.choices %>
-  \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
+  \item[\bubble{ {{ choice.label }} }] {{ choice.text | escape_latex }}
 <% endfor %>
 \end{itemize}
 \end{minipage}
@@ -96,12 +96,12 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 
 <% for q in part_b_questions %>
 \noindent\begin{minipage}{\textwidth}
-\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt | escape_latex }} }
 
 \vspace{0.3em}
 \begin{itemize}[leftmargin=2em, label={}]
 <% for choice in q.choices %>
-  \item[\bubble{ {{ choice.label }} }] {{ choice.text }}
+  \item[\bubble{ {{ choice.label }} }] {{ choice.text | escape_latex }}
 <% endfor %>
 \end{itemize}
 \end{minipage}
@@ -116,7 +116,7 @@ Points <% for part in parts %> & {{ part.points }} <% endfor %> & {{ total_point
 
 <% for q in part_c_questions %>
 \noindent\begin{minipage}{\textwidth}
-\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt }} }
+\question{ {{ q.id }} }{ {{ q.points }} }{ {{ q.prompt | escape_latex }} }
 
 \vspace{0.5em}
 \writingbox{ {{ q.box_height }} }

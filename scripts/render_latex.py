@@ -2,9 +2,34 @@
 
 import json
 import os
+import re
 import sys
 
 from jinja2 import Environment, FileSystemLoader
+
+
+def escape_latex(value):
+    """Escape LaTeX special characters in a string.
+    
+    Escapes: _, &, %, $, #, {, }, ~, ^, \
+    """
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        return str(value)
+
+    # Escape backslash first, then other special chars
+    result = value.replace("\\", "\\textbackslash{}")
+    result = result.replace("&", "\\&")
+    result = result.replace("%", "\\%")
+    result = result.replace("$", "\\$")
+    result = result.replace("#", "\\#")
+    result = result.replace("{", "\\{")
+    result = result.replace("}", "\\}")
+    result = result.replace("~", "\\textasciitilde{}")
+    result = result.replace("^", "\\textasciicircum{}")
+    result = result.replace("_", "\\_")
+    return result
 
 
 def render_template(
@@ -41,6 +66,9 @@ def render_template(
         comment_start_string="<#",
         comment_end_string="#>",
     )
+
+    # Register the escape filter
+    env.filters["escape_latex"] = escape_latex
 
     template = env.get_template(template_name)
     rendered = template.render(**data)

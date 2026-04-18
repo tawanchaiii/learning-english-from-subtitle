@@ -45,7 +45,7 @@ Date: {{ generated_date }}
 \noindent Based on your level ({{ learner_cefr }}), focus on these words first:
 \begin{enumerate}[leftmargin=2em]
 <% for word in priority_words %>
-  \item \textbf{ {{ word }} }
+  \item \textbf{ {{ word | escape_latex }} }
 <% endfor %>
 \end{enumerate}
 
@@ -68,7 +68,7 @@ Date: {{ generated_date }}
 \bottomrule
 \endfoot
 <% for word in level.words %>
-{{ word.word }} & {{ word.pos }} & {{ word.meaning }} & \textit{ {{ word.movie_example }} } & {{ word.real_life_example }} \\
+{{ word.word | escape_latex }} & {{ word.pos | escape_latex }} & {{ word.meaning | escape_latex }} & \textit{ {{ word.movie_example | escape_latex }} } & {{ word.real_life_example | escape_latex }} \\
 \midrule
 <% endfor %>
 \end{longtable}
