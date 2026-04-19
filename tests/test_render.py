@@ -4,7 +4,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
-from render import render_template, escape_typst, escape_latex
+from render import render_template, escape_typst
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "..", "templates")
 
@@ -24,17 +24,6 @@ class TestEscapeFilters:
 
     def test_escape_typst_non_string(self):
         assert escape_typst(42) == "42"
-
-    def test_escape_latex_special_chars(self):
-        result = escape_latex("price $5 & 10% off #1")
-        assert r"\$" in result
-        assert r"\&" in result
-        assert r"\%" in result
-        assert r"\#" in result
-
-    def test_escape_latex_none(self):
-        assert escape_latex(None) == ""
-
 
 class TestExerciseTypRendering:
     def test_render_exercise_typ(self):
@@ -390,39 +379,3 @@ class TestListeningTypRendering:
             assert "Listening Exercise" in content
 
 
-class TestLegacyLatexRendering:
-    def test_render_exercise_tex_still_works(self):
-        data = {
-            "doc_type": "Exercise",
-            "movie_name": "TestMovie",
-            "cefr_level": "B1",
-            "detected_cefr": "B1",
-            "learner_cefr": "A2",
-            "generated_date": "2026-04-19",
-            "total_points": 65,
-            "parts": [
-                {"label": "A", "points": 30},
-                {"label": "B", "points": 20},
-                {"label": "C", "points": 15},
-            ],
-            "part_a_points": 30,
-            "part_a_questions": [],
-            "part_b_points": 20,
-            "part_b_questions": [],
-            "part_b_needs_newpage": True,
-            "part_c_points": 15,
-            "part_c_questions": [],
-        }
-        with tempfile.TemporaryDirectory() as tmpdir:
-            output_path = os.path.join(tmpdir, "test.tex")
-            render_template(
-                template_name="exercise.tex.j2",
-                data=data,
-                output_path=output_path,
-                templates_dir=TEMPLATES_DIR,
-            )
-            assert os.path.exists(output_path)
-            with open(output_path, "r") as f:
-                content = f.read()
-            assert "TestMovie" in content
-            assert "\\documentclass" in content

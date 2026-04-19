@@ -31,7 +31,7 @@ If arguments are unclear, ask the user which mode they want.
 Before starting, verify these are installed:
 ```bash
 python3 -c "import jinja2; print('jinja2 OK')"
-xelatex --version | head -1
+typst --version | head -1
 ```
 If anything is missing, tell the user how to install it and stop.
 
@@ -272,7 +272,7 @@ Before starting, verify these are installed:
 ```bash
 python3 -c "import jinja2; print('jinja2 OK')"
 python3 -c "import mlx_audio; print('mlx_audio OK')"
-xelatex --version | head -1
+typst --version | head -1
 ```
 If anything is missing, tell the user how to install it and stop.
 
@@ -645,14 +645,14 @@ All PDFs use CS188 UC Berkeley exam style:
 - Bordered boxes for writing areas and feedback
 - Question format: `A1 (2 points) Question text`
 
-Templates are Typst (`.typ.j2`, primary) and LaTeX (`.tex.j2`, legacy fallback).
+Templates are Typst (`.typ.j2`).
 
 ## Error Handling
 
 - Unrecognized subtitle format: show supported formats (.srt, .vtt)
 - Scanned PDF unreadable: report which questions couldn't be parsed, score only readable ones
 - Missing guideline.json: tell learner to run generate first
-- xelatex not installed: provide install instructions
+- typst not installed: provide install instructions (`brew install typst`)
 - docling-mcp not configured: provide setup instructions
 - mlx_audio not installed: provide install instructions (`pip install mlx_audio`)
 - Qwen3-TTS model not downloaded: provide Hugging Face download instructions
@@ -670,9 +670,8 @@ When subtitle context is insufficient, use these tools for supplementary researc
 - `exa_web_search_advanced_exa` — Advanced search with filters for detailed research
 
 **Template Rendering & PDF Compilation:**
-- `python3 scripts/render.py <template.j2> <data.json> <output>` — Render Jinja2 template with data (Typst `.typ.j2` or legacy LaTeX `.tex.j2`)
-- `bash scripts/compile_pdf.sh <file.typ>` — Compile .typ to PDF (uses typst; primary)
-- `bash scripts/compile_pdf.sh <file.tex>` — Compile .tex to PDF (uses xelatex; legacy fallback)
+- `python3 scripts/render.py <template.typ.j2> <data.json> <output.typ>` — Render Jinja2 Typst template with data
+- `bash scripts/compile_pdf.sh <file.typ>` — Compile .typ to PDF (uses typst)
 
 **TTS Audio Generation:**
 - `python3 scripts/generate_tts.py --model-path <path> --mode <base|design|custom> --input-file <passages.json> --output-dir <dir>` — Generate audio from text using Qwen3-TTS via MLX-Audio

@@ -13,8 +13,7 @@ The `english-teacher` skill has three modes:
 ## Requirements
 
 - Python 3 with `jinja2` and `pytest`
-- `typst` for PDF generation (primary; `brew install typst`)
-- `xelatex` (TeX Live) for PDF generation (legacy fallback; `brew install --cask mactex`)
+- `typst` for PDF generation (`brew install typst`)
 - `mlx_audio` for TTS generation (listening mode): `pip install mlx_audio`
 - Qwen3-TTS model (listening mode): download from [MLX Community](https://huggingface.co/collections/mlx-community/qwen3-tts) to `models/`
 - [`docling-mcp`](https://github.com/docling-project/docling-mcp) for reading scanned PDFs (assess mode only)
@@ -25,11 +24,8 @@ The `english-teacher` skill has three modes:
 # Install Python deps
 uv pip install -r requirements.txt --system
 
-# Install typst (primary PDF engine)
+# Install typst
 brew install typst
-
-# (Legacy) Install xelatex fallback
-# brew install --cask mactex
 
 # For listening exercises: install mlx_audio
 pip install mlx_audio
@@ -102,13 +98,11 @@ Outputs in the same folder:
 ```
 scripts/         Parsing and rendering pipeline
   parse_subtitle.py   .srt/.vtt -> scenes.json
-  render.py            JSON + Jinja2 template -> .typ or .tex
-  render_latex.py      (legacy) JSON + Jinja2 template -> .tex
+  render.py            JSON + Jinja2 template -> .typ
   generate_tts.py      Text -> audio via Qwen3-TTS / MLX-Audio
-  compile_pdf.sh      typst/xelatex wrapper
-templates/       Jinja2 templates (Typst .typ.j2 primary; LaTeX .tex.j2 legacy)
+  compile_pdf.sh      typst wrapper
+templates/       Jinja2 Typst templates (.typ.j2)
   common.typ.j2, exercise.typ.j2, vocabulary.typ.j2, assessment.typ.j2, listening.typ.j2
-  common.tex.j2, exercise.tex.j2, vocabulary.tex.j2, assessment.tex.j2, listening.tex.j2
 tests/           pytest suite
 output/          Generated exercise folders (gitignored)
 .agents/skills/english-teacher/SKILL.md   Skill definition (agent-compatible layout)
@@ -122,9 +116,6 @@ python3 -m pytest tests/ -v
 
 # Compile a .typ file to PDF
 bash scripts/compile_pdf.sh path/to/file.typ
-
-# Compile a .tex file to PDF (legacy)
-bash scripts/compile_pdf.sh path/to/file.tex
 ```
 
 ## Exercise format
