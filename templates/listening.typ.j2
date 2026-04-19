@@ -17,7 +17,7 @@
 
   #v(1.5em)
 
-  Print Your Name: #line(length: 8cm, stroke: 0.4pt)
+  Print Your Name: #box(width: 8cm, stroke: (bottom: 0.4pt + black))[~]
 
   #v(2em)
 
@@ -54,8 +54,8 @@
 
   #v(0.5em)
 
-  - #bubble[A] Unselected option (completely unfilled)
-  - #filled-bubble[C] Your selected option (completely filled)
+  #block(below: 0.5em)[#bubble[A] #h(0.3em) Unselected option (completely unfilled)]
+  #block(below: 0.5em)[#filled-bubble[C] #h(0.3em) Your selected option (completely filled)]
 
   #v(1em)
   #line(length: 100%, stroke: 0.5pt)
@@ -83,16 +83,18 @@
 <% endif %>
 
 <% for q in passage.questions %>
-#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+#block(breakable: false)[
+  #question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
 
-#v(0.3em)
-<% if q.type == "multiple_choice" %>
-<% for choice in q.choices %>
-- #bubble[{{ choice.label }}] {{ choice.text | escape_typst }}
-<% endfor %>
-<% elif q.type == "short_answer" %>
-#writingbox(height: {{ q.box_height | default("3cm") }})
-<% endif %>
+  #v(0.3em)
+  <% if q.type == "multiple_choice" %>
+  <% for choice in q.choices %>
+  #block(below: 0.5em)[#bubble[{{ choice.label }}] #h(0.3em) {{ choice.text | escape_typst }}]
+  <% endfor %>
+  <% elif q.type == "short_answer" %>
+  #writingbox(height: {{ q.box_height | default("3cm") }})
+  <% endif %>
+]
 
 #v(1em)
 <% endfor %>
@@ -105,7 +107,7 @@
 <% endfor %>
 
 // ===== PART B: LONGER TALKS =====
-#pagebreak
+#pagebreak()
 = Part B: Longer Talks ({{ part_b_points }} points)
 
 #text(style: "italic")[Listen to each passage. Then answer the questions that follow.]
@@ -125,16 +127,18 @@
 <% endif %>
 
 <% for q in passage.questions %>
-#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+#block(breakable: false)[
+  #question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
 
-#v(0.3em)
-<% if q.type == "multiple_choice" %>
-<% for choice in q.choices %>
-- #bubble[{{ choice.label }}] {{ choice.text | escape_typst }}
-<% endfor %>
-<% elif q.type == "short_answer" %>
-#writingbox(height: {{ q.box_height | default("3cm") }})
-<% endif %>
+  #v(0.3em)
+  <% if q.type == "multiple_choice" %>
+  <% for choice in q.choices %>
+  #block(below: 0.5em)[#bubble[{{ choice.label }}] #h(0.3em) {{ choice.text | escape_typst }}]
+  <% endfor %>
+  <% elif q.type == "short_answer" %>
+  #writingbox(height: {{ q.box_height | default("3cm") }})
+  <% endif %>
+]
 
 #v(1em)
 <% endfor %>
@@ -142,7 +146,7 @@
 <% if not loop.last %>
 #line(length: 100%, stroke: 0.3pt)
 #v(1em)
-#pagebreak
+#pagebreak()
 <% endif %>
 
 <% endfor %>

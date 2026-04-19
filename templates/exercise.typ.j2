@@ -17,7 +17,7 @@
 
   #v(1.5em)
 
-  Print Your Name: #line(length: 8cm, stroke: 0.4pt)
+  Print Your Name: #box(width: 8cm, stroke: (bottom: 0.4pt + black))[~]
 
   #v(2em)
 
@@ -40,8 +40,8 @@
   #text(style: "italic")[For questions with circular bubbles, you may select only one choice.]
 
   #v(0.5em)
-  - #bubble[A] Unselected option (completely unfilled)
-  - #filled-bubble[C] Your selected option (completely filled)
+  #block(below: 0.5em)[#bubble[A] #h(0.3em) Unselected option (completely unfilled)]
+  #block(below: 0.5em)[#filled-bubble[C] #h(0.3em) Your selected option (completely filled)]
 
   #v(1em)
 
@@ -70,14 +70,16 @@
 
 #v(0.3em)
 <% for choice in q.choices %>
-- #bubble([{{ choice.label }}]) {{ choice.text | escape_typst }}
+#block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
 <% endfor %>
 
 #v(1em)
 <% endfor %>
 
 // ===== PART B: COMPREHENSION (MULTIPLE CHOICE) =====
-<% if part_b_needs_newpage %>#pagebreak<% endif %>
+<% if part_b_needs_newpage %>
+#pagebreak()
+<% endif %>
 = Part B: Comprehension ({{ part_b_points }} points)
 
 <% for q in part_b_questions %>
@@ -85,24 +87,28 @@
 
 #v(0.3em)
 <% for choice in q.choices %>
-- #bubble([{{ choice.label }}]) {{ choice.text | escape_typst }}
+#block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
 <% endfor %>
 
 #v(1em)
 <% endfor %>
 
 // ===== PART C: SUBJECTIVE WRITING =====
-#pagebreak
+#pagebreak()
 = Part C: Subjective Writing ({{ part_c_points }} points)
 
 <% for q in part_c_questions %>
-#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+#block(breakable: false)[
+  #question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
 
-#v(0.5em)
-#writingbox(height: {{ q.box_height }})
+  #v(0.5em)
+  #writingbox(height: {{ q.box_height }})
+]
 <% if not loop.last %>
 
 #v(1.5em)
 <% endif %>
-<% if q.needs_newpage %>#pagebreak<% endif %>
+<% if q.needs_newpage %>
+#pagebreak()
+<% endif %>
 <% endfor %>

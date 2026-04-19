@@ -65,5 +65,7 @@
   <% endfor %>
 )
 
-<% if not loop.last %>#pagebreak<% endif %>
+<% if not loop.last %>
+#pagebreak()
+<% endif %>
 <% endfor %>

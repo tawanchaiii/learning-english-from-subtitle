@@ -67,7 +67,7 @@ Your answer: *{{ q.learner_answer }}* #h(1fr) Correct answer: *{{ q.correct_answ
 <% endfor %>
 
 // ===== PART C: SUBJECTIVE FEEDBACK =====
-#pagebreak
+#pagebreak()
 = Part C: Subjective Writing — Detailed Feedback ({{ part_c_score }}/{{ part_c_total }})
 
 <% for q in part_c_results %>
@@ -103,7 +103,7 @@ Your answer: *{{ q.learner_answer }}* #h(1fr) Correct answer: *{{ q.correct_answ
 <% endfor %>
 
 // ===== PROFICIENCY ASSESSMENT =====
-#pagebreak
+#pagebreak()
 = Proficiency Assessment
 
 *Estimated CEFR Level:* {{ estimated_cefr }}\

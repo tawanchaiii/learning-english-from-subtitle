@@ -37,23 +37,37 @@
 }
 
 // Custom helper functions
-#let bubble(label) = {
-  circle(
-    text(size: 8pt, label),
-    radius: 0.55em,
-    stroke: 0.3pt + black,
-    fill: white,
-  )
-}
+#let bubble(label) = box(
+  width: 1.2em,
+  height: 1.2em,
+  baseline: 0.25em,
+  radius: 50%,
+  stroke: 0.3pt + black,
+  inset: 0pt,
+  align(center + horizon, text(
+    size: 7pt,
+    top-edge: "cap-height",
+    bottom-edge: "baseline",
+    label,
+  )),
+)
 
-#let filled-bubble(label) = {
-  circle(
-    text(size: 8pt, fill: white, label),
-    radius: 0.55em,
-    stroke: 0.3pt + black,
-    fill: black,
-  )
-}
+#let filled-bubble(label) = box(
+  width: 1.2em,
+  height: 1.2em,
+  baseline: 0.25em,
+  radius: 50%,
+  stroke: 0.3pt + black,
+  fill: black,
+  inset: 0pt,
+  align(center + horizon, text(
+    size: 7pt,
+    fill: white,
+    top-edge: "cap-height",
+    bottom-edge: "baseline",
+    label,
+  )),
+)
 
 #let writingbox(height: 3cm) = {
   rect(width: 100%, height: height, stroke: 0.5pt + black, fill: white, inset: 4pt)
