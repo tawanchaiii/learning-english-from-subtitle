@@ -33,6 +33,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 import time
 
@@ -43,15 +44,43 @@ CUSTOM_VOICES = ("Chelsie", "Ethan", "Vivienne", "Ryan")
 # Gives listeners a moment to process the sentence before the clip ends.
 TRAILING_SILENCE_SECONDS = 1.0
 
+# Silence inserted between per-sentence generations (seconds) so the
+# concatenated output has natural pauses where the speaker would breathe.
+INTER_SENTENCE_SILENCE_SECONDS = 0.5
+
+
+def _silence_like(audio_ref, sample_rate, seconds):
+    """Return a zeros array sized `seconds` long matching `audio_ref`'s shape/dtype."""
+    import mlx.core as mx
+
+    shape = list(audio_ref.shape)
+    shape[0] = int(sample_rate * seconds)
+    return mx.zeros(tuple(shape), dtype=audio_ref.dtype)
+
 
 def _append_trailing_silence(audio, sample_rate):
     """Concatenate `TRAILING_SILENCE_SECONDS` of zeros onto an mx audio array."""
     import mlx.core as mx
 
-    silence_shape = list(audio.shape)
-    silence_shape[0] = int(sample_rate * TRAILING_SILENCE_SECONDS)
-    silence = mx.zeros(tuple(silence_shape), dtype=audio.dtype)
+    silence = _silence_like(audio, sample_rate, TRAILING_SILENCE_SECONDS)
     return mx.concatenate([audio, silence], axis=0)
+
+
+def _split_sentences(text):
+    """Split text into individual sentences for per-sentence TTS generation.
+
+    Long single-paragraph passages cause the TTS model to truncate the tail;
+    splitting on sentence boundaries keeps each generation short enough to
+    fit within the model's output budget.
+    """
+    sentences = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = re.split(r"(?<=[.!?])\s+", line)
+        sentences.extend(p.strip() for p in parts if p.strip())
+    return sentences
 
 
 def check_mlx_audio():
@@ -90,11 +119,13 @@ def generate_design(
     import mlx.core as mx
     from mlx_audio.audio_io import write as audio_write
 
-    segments = [s.strip() for s in text.split("\n") if s.strip()]
+    segments = _split_sentences(text)
     audio = []
     for i, seg in enumerate(segments):
         if verbose:
             print(f"  Segment {i + 1}/{len(segments)}: {seg[:60]}...")
+        if i > 0 and audio:
+            audio.append(_silence_like(audio[-1], sample_rate, INTER_SENTENCE_SILENCE_SECONDS))
         results = model.generate_voice_design(
             text=seg, instruct=speaker_design, verbose=verbose
         )
@@ -112,11 +143,13 @@ def generate_custom(
     import mlx.core as mx
     from mlx_audio.audio_io import write as audio_write
 
-    segments = [s.strip() for s in text.split("\n") if s.strip()]
+    segments = _split_sentences(text)
     audio = []
     for i, seg in enumerate(segments):
         if verbose:
             print(f"  Segment {i + 1}/{len(segments)}: {seg[:60]}...")
+        if i > 0 and audio:
+            audio.append(_silence_like(audio[-1], sample_rate, INTER_SENTENCE_SILENCE_SECONDS))
         results = model.generate_custom_voice(
             text=seg, speaker=speaker_name, instruct=speaker_instruct, verbose=verbose
         )
