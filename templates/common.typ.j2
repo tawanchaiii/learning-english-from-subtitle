@@ -36,6 +36,9 @@
   text(size: 11pt, weight: "bold", it.body)
 }
 
+// Make hyperlinks visually distinguishable (blue + underline)
+#show link: it => underline(text(fill: rgb("#1a73e8"), it))
+
 // Custom helper functions
 #let bubble(label) = box(
   width: 1.2em,

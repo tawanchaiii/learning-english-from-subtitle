@@ -48,9 +48,9 @@
   #v(1em)
 
   #text(style: "italic")[
-    Audio tracks are provided as separate files: `{{ audio_prefix }}_track_NN.mp3`\
+    Click the *▶ Track N* link next to each passage to play its audio.\
   ]
-  #text(style: "italic")[Play each track before answering the questions for that passage.]
+  #text(style: "italic")[Audio files sit in the `audio/` folder next to this PDF; keep them together when sharing.]
 
   #v(0.5em)
 
@@ -72,7 +72,7 @@
 
 <% for passage in part_a_passages %>
 // --- Passage {{ passage.id }} ---
-*Track {{ passage.track_number }}* #h(1fr) _{{ passage.scene_ref }}_
+#link("audio/{{ audio_prefix }}_track_{{ "%02d"|format(passage.track_number) }}.mp3")[*▶ Track {{ passage.track_number }}*] #h(1fr) _{{ passage.scene_ref }}_
 
 #v(0.5em)
 
@@ -116,7 +116,7 @@
 
 <% for passage in part_b_passages %>
 // --- Passage {{ passage.id }} ---
-*Track {{ passage.track_number }}* #h(1fr) _{{ passage.scene_ref }}_
+#link("audio/{{ audio_prefix }}_track_{{ "%02d"|format(passage.track_number) }}.mp3")[*▶ Track {{ passage.track_number }}*] #h(1fr) _{{ passage.scene_ref }}_
 
 #v(0.5em)
 
