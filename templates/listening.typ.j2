@@ -1,0 +1,148 @@
+// listening.typ.j2 — Listening Exercise PDF (TOEFL style, CS188 format)
+
+#import "common.typ.j2": *
+
+// ===== COVER PAGE =====
+#page(numbering: none)[
+  #align(left)[
+    #text(size: 20pt, weight: "bold")[Listening Exercise]\
+    #text(size: 16pt, weight: "bold")[{{ movie_name }}]
+  ]
+  #h(1fr)
+  #align(right)[
+    Movie CEFR: {{ detected_cefr }}\
+    Your Level: {{ learner_cefr }}\
+    Date: {{ generated_date }}
+  ]
+
+  #v(1.5em)
+
+  Print Your Name: #line(length: 8cm, stroke: 0.4pt)
+
+  #v(2em)
+
+  There are 2 parts. ({{ total_points }} points total)
+
+  #v(1em)
+
+  #align(center)[
+    #table(
+      columns: (2fr, 1fr, 1fr),
+      align: (left, center, center),
+      stroke: 0.5pt,
+      [*Part*], [*Questions*], [*Points*],
+      [Part A: Short Conversations], [{{ part_a_count }}], [{{ part_a_points }}],
+      [Part B: Longer Talks], [{{ part_b_count }}], [{{ part_b_points }}],
+      [*Total*], [*{{ total_count }}*], [*{{ total_points }}*],
+    )
+  ]
+
+  #v(1.5em)
+
+  *Instructions:*
+  + Each question has an audio track. Play the track before answering.
+  + For multiple choice, select *one* answer by filling in the bubble completely.
+  + For short answer questions, write clearly inside the answer box.
+  + You may replay each track up to 2 times during the exercise.
+
+  #v(1em)
+
+  #text(style: "italic")[
+    Audio tracks are provided as separate files: `{{ audio_prefix }}_track_NN.mp3`\
+  ]
+  #text(style: "italic")[Play each track before answering the questions for that passage.]
+
+  #v(0.5em)
+
+  - #bubble[A] Unselected option (completely unfilled)
+  - #filled-bubble[C] Your selected option (completely filled)
+
+  #v(1em)
+  #line(length: 100%, stroke: 0.5pt)
+]
+
+#set page(numbering: "1")
+
+// ===== PART A: SHORT CONVERSATIONS =====
+= Part A: Short Conversations ({{ part_a_points }} points)
+
+#text(style: "italic")[Listen to each conversation. Then answer the question that follows.]
+
+#v(1em)
+
+<% for passage in part_a_passages %>
+// --- Passage {{ passage.id }} ---
+*Track {{ passage.track_number }}* #h(1fr) _{{ passage.scene_ref }}_
+
+#v(0.5em)
+
+<% if passage.context %>
+#text(style: "italic")[Context: {{ passage.context | escape_typst }}]
+
+#v(0.3em)
+<% endif %>
+
+<% for q in passage.questions %>
+#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+
+#v(0.3em)
+<% if q.type == "multiple_choice" %>
+<% for choice in q.choices %>
+- #bubble[{{ choice.label }}] {{ choice.text | escape_typst }}
+<% endfor %>
+<% elif q.type == "short_answer" %>
+#writingbox(height: {{ q.box_height | default("3cm") }})
+<% endif %>
+
+#v(1em)
+<% endfor %>
+
+<% if not loop.last %>
+#line(length: 100%, stroke: 0.3pt)
+#v(1em)
+<% endif %>
+
+<% endfor %>
+
+// ===== PART B: LONGER TALKS =====
+#pagebreak
+= Part B: Longer Talks ({{ part_b_points }} points)
+
+#text(style: "italic")[Listen to each passage. Then answer the questions that follow.]
+
+#v(1em)
+
+<% for passage in part_b_passages %>
+// --- Passage {{ passage.id }} ---
+*Track {{ passage.track_number }}* #h(1fr) _{{ passage.scene_ref }}_
+
+#v(0.5em)
+
+<% if passage.context %>
+#text(style: "italic")[Context: {{ passage.context | escape_typst }}]
+
+#v(0.3em)
+<% endif %>
+
+<% for q in passage.questions %>
+#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+
+#v(0.3em)
+<% if q.type == "multiple_choice" %>
+<% for choice in q.choices %>
+- #bubble[{{ choice.label }}] {{ choice.text | escape_typst }}
+<% endfor %>
+<% elif q.type == "short_answer" %>
+#writingbox(height: {{ q.box_height | default("3cm") }})
+<% endif %>
+
+#v(1em)
+<% endfor %>
+
+<% if not loop.last %>
+#line(length: 100%, stroke: 0.3pt)
+#v(1em)
+#pagebreak
+<% endif %>
+
+<% endfor %>

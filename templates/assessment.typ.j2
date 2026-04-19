@@ -1,0 +1,146 @@
+// assessment.typ.j2 — Assessment Report PDF (CS188 exam style)
+
+#import "common.typ.j2": *
+
+// ===== COVER PAGE =====
+#page(numbering: none)[
+  #align(left)[
+    #text(size: 20pt, weight: "bold")[Assessment Report]\
+    #text(size: 16pt, weight: "bold")[{{ movie_name }}]
+  ]
+  #h(1fr)
+  #align(right)[
+    Learner Level: {{ learner_cefr }}\
+    Assessment Date: {{ assessment_date }}\
+    Overall Score: *{{ overall_score }}/{{ overall_total }} ({{ overall_percent }}%)*
+  ]
+
+  #v(2em)
+
+  = Score Summary
+
+  #align(center)[
+    #table(
+      columns: (1fr, 1fr, 2fr),
+      align: (left, center, left),
+      stroke: 0.5pt,
+      [*Part*], [*Score*], [*Visual*],
+      <% for part in score_parts %>
+      [{{ part.label }}], [{{ part.score }}/{{ part.total }}], [#scorebar({{ part.score }}, {{ part.total }})],
+      <% endfor %>
+      [*Overall*], [*{{ overall_score }}/{{ overall_total }}*], [#scorebar({{ overall_score }}, {{ overall_total }})],
+    )
+  ]
+]
+
+#page(numbering: "1")
+
+// ===== PART A & B: DETAILED RESULTS =====
+= Part A: Vocabulary — Detailed Results ({{ part_a_score }}/{{ part_a_total }})
+
+<% for q in part_a_results %>
+*{{ q.id }}* {{ q.prompt }}\
+Your answer: *{{ q.learner_answer }}* #h(1fr) Correct answer: *{{ q.correct_answer }}* #h(1fr) <% if q.is_correct %>$checkmark$ Correct<% else %>$times$ Incorrect<% endif %>
+
+<% if not q.is_correct %>
+#rect(width: 100%, stroke: 0.5pt + black, fill: white, inset: 4pt)[
+  _{{ q.explanation }}_
+]
+#v(0.3em)
+<% endif %>
+
+<% endfor %>
+
+= Part B: Comprehension — Detailed Results ({{ part_b_score }}/{{ part_b_total }})
+
+<% for q in part_b_results %>
+*{{ q.id }}* {{ q.prompt }}\
+Your answer: *{{ q.learner_answer }}* #h(1fr) Correct answer: *{{ q.correct_answer }}* #h(1fr) <% if q.is_correct %>$checkmark$ Correct<% else %>$times$ Incorrect<% endif %>
+
+<% if not q.is_correct %>
+#rect(width: 100%, stroke: 0.5pt + black, fill: white, inset: 4pt)[
+  _{{ q.explanation }}_
+]
+#v(0.3em)
+<% endif %>
+
+<% endfor %>
+
+// ===== PART C: SUBJECTIVE FEEDBACK =====
+#pagebreak
+= Part C: Subjective Writing — Detailed Feedback ({{ part_c_score }}/{{ part_c_total }})
+
+<% for q in part_c_results %>
+== {{ q.id }} ({{ q.score }}/{{ q.max_score }}): {{ q.prompt }}
+
+*Your answer:*
+#rect(width: 100%, stroke: 0.5pt + black, fill: white, inset: 4pt)[
+  {{ q.learner_answer }}
+]
+
+#v(0.5em)
+
+*Criteria scores:*
+<% for criterion in q.criteria_scores %>
+- *{{ criterion.name }}* ({{ criterion.score }}/{{ criterion.max }}): {{ criterion.feedback }}
+<% endfor %>
+
+<% if q.corrections %>
+*Corrections:*
+<% for correction in q.corrections %>
+- {{ correction }}
+<% endfor %>
+<% endif %>
+
+<% if q.strengths %>
+*Strengths:*
+<% for strength in q.strengths %>
+- {{ strength }}
+<% endfor %>
+<% endif %>
+
+#v(1em)
+<% endfor %>
+
+// ===== PROFICIENCY ASSESSMENT =====
+#pagebreak
+= Proficiency Assessment
+
+*Estimated CEFR Level:* {{ estimated_cefr }}\
+*Self-declared Level:* {{ learner_cefr }}\
+*Comparison:* {{ cefr_comparison }}
+
+#v(1em)
+
+*Skill Breakdown:*
+
+#align(center)[
+  #table(
+    columns: (1fr, 1fr, 2fr),
+    align: (left, center, left),
+    stroke: 0.5pt,
+    [*Skill*], [*Level*], [*Assessment*],
+    <% for skill in skill_breakdown %>
+    [{{ skill.name }}], [{{ skill.level }}], [{{ skill.assessment }}],
+    <% endfor %>
+  )
+]
+
+// ===== PERSONALIZED STUDY PLAN =====
+#v(1.5em)
+= Personalized Study Plan
+
+== Weak Areas to Focus On
+<% for area in weak_areas %>
+- *{{ area.topic }}*: {{ area.detail }}
+<% endfor %>
+
+== Recommended Practice
+<% for rec in recommendations %>
+- {{ rec }}
+<% endfor %>
+
+== Suggested Next Movies
+<% for movie in suggested_movies %>
++ *{{ movie.title }}* ({{ movie.cefr }}) --- {{ movie.reason }}
+<% endfor %>

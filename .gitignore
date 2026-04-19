@@ -13,3 +13,6 @@ __pycache__/
 *.egg-info/
 venv/
 .venv/
+models/
+*.mp3
+*.wav

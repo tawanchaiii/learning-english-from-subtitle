@@ -1,0 +1,75 @@
+// common.typ.j2 — Shared styles for all English Teacher PDFs
+// Style: CS188 exam format (clean, black & white, academic)
+
+#set page(
+  paper: "a4",
+  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
+)
+
+#set text(
+  font: "New Computer Modern",
+  size: 11pt,
+  lang: "en",
+)
+
+#set par(justify: true, leading: 0.65em)
+
+// Footer: Doc Type | Page X of Y | Movie --- CEFR
+#set page(
+  footer: context [
+    #text(size: 9pt)[
+      #{{ doc_type }}#h(1fr)#counter(page).display("1") of #counter(page).final()#h(1fr){{ movie_name }} --- {{ cefr_level }}
+    ]
+  ],
+)
+
+// Heading styles
+#show heading.where(level: 1): it => {
+  v(0.5em)
+  text(size: 14pt, weight: "bold", it.body)
+  v(0.3em)
+  line(length: 100%, stroke: 0.5pt)
+  v(0.3em)
+}
+
+#show heading.where(level: 2): it => {
+  text(size: 11pt, weight: "bold", it.body)
+}
+
+// Custom helper functions
+#let bubble(label) = {
+  circle(
+    text(size: 8pt, label),
+    radius: 0.55em,
+    stroke: 0.3pt + black,
+    fill: white,
+  )
+}
+
+#let filled-bubble(label) = {
+  circle(
+    text(size: 8pt, fill: white, label),
+    radius: 0.55em,
+    stroke: 0.3pt + black,
+    fill: black,
+  )
+}
+
+#let writingbox(height: 3cm) = {
+  rect(width: 100%, height: height, stroke: 0.5pt + black, fill: white, inset: 4pt)
+}
+
+#let question(id, points, prompt) = {
+  [*#id* (#points points) #prompt]
+  v(0.4em)
+}
+
+#let scorebar(score, total) = {
+  let frac = score / total
+  box(width: 4cm, height: 0.3cm, {
+    rect(width: 4cm, height: 0.3cm, fill: black.lighten(80%), stroke: none)
+    rect(width: 4cm * frac, height: 0.3cm, fill: black.lighten(40%), stroke: none)
+    h(0.2cm)
+    text(size: 9pt)[#score/#total]
+  })
+}

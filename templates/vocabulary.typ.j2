@@ -1,0 +1,69 @@
+// vocabulary.typ.j2 — Vocabulary List PDF (CS188 exam style)
+
+#import "common.typ.j2": *
+
+// ===== COVER PAGE =====
+#page(numbering: none)[
+  #align(left)[
+    #text(size: 20pt, weight: "bold")[Vocabulary List]\
+    #text(size: 16pt, weight: "bold")[{{ movie_name }}]
+  ]
+  #h(1fr)
+  #align(right)[
+    Movie CEFR: {{ detected_cefr }}\
+    Total Words: {{ total_words }}\
+    Date: {{ generated_date }}
+  ]
+
+  #v(2em)
+
+  = CEFR Distribution
+
+  #align(center)[
+    #table(
+      columns: (1fr, 1fr),
+      align: (left, center),
+      stroke: 0.5pt,
+      [*Level*],
+      [*Count*],
+      <% for level in cefr_levels %>
+      [{{ level.name }}],
+      [{{ level.count }}],
+      <% endfor %>
+    )
+  ]
+
+  #v(1em)
+
+  = Recommended Study Order
+
+  Based on your level ({{ learner_cefr }}), focus on these words first:
+  <% for word in priority_words %>
+  + *{{ word | escape_typst }}*
+  <% endfor %>
+]
+
+#set page(numbering: "1")
+
+// ===== VOCABULARY TABLES BY CEFR LEVEL =====
+<% for level in cefr_sections %>
+= [{{ level.name }}] {{ level.description | escape_typst }}
+
+{{ level.count }} words
+
+#v(0.5em)
+
+#table(
+  columns: (2.2cm, 1.5cm, 3cm, 3.5cm, 3.5cm),
+  align: (left, left, left, left, left),
+  stroke: 0.5pt,
+  table.header(
+    [*Word*], [*POS*], [*Meaning*], [*Movie Example*], [*Real-life Example*],
+  ),
+  <% for word in level.words %>
+  [{{ word.word | escape_typst }}], [{{ word.pos | escape_typst }}], [{{ word.meaning | escape_typst }}], [_{{ word.movie_example | escape_typst }}_], [{{ word.real_life_example | escape_typst }}],
+  <% endfor %>
+)
+
+<% if not loop.last %>#pagebreak<% endif %>
+<% endfor %>

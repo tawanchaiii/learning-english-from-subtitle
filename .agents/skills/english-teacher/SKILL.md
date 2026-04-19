@@ -1,7 +1,7 @@
 ---
 name: english-teacher
 description: Generate English exercises from movie subtitles and assess completed exercises. Use when user wants to create English learning materials from movies or grade completed exercises.
-argument-hint: "generate <subtitle.srt> --level <CEFR> | assess <movie-folder> <scanned.pdf>"
+argument-hint: "generate <subtitle.srt> --level <CEFR> | listening <subtitle.srt> --level <CEFR> | assess <movie-folder> <scanned.pdf>"
 ---
 
 # English Teacher — Movie Subtitle Exercise Generator & Assessor
@@ -13,6 +13,7 @@ You are an expert English teacher creating exercises from movie subtitles and as
 Parse the arguments to determine which mode to run:
 
 - `generate <file> --level <CEFR>` → Generate Mode
+- `listening <file> --level <CEFR> [--model-path <path>] [--tts-mode <mode>]` → Listening Mode
 - `assess <folder> <pdf>` → Assess Mode
 
 If arguments are unclear, ask the user which mode they want.
@@ -209,8 +210,8 @@ Write the complete guideline to `output/<movie-name>/<movie-name>-guideline.json
 
 Write the exercise data as a JSON file, then render and compile:
 ```bash
-python3 scripts/render_latex.py exercise.tex.j2 output/<movie-name>/<movie-name>-exercise-data.json output/<movie-name>/<movie-name>-exercise.tex
-bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-exercise.tex
+python3 scripts/render.py exercise.typ.j2 output/<movie-name>/<movie-name>-exercise-data.json output/<movie-name>/<movie-name>-exercise.typ
+bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-exercise.typ
 ```
 
 The exercise data JSON must include these keys matching the template variables:
@@ -225,8 +226,8 @@ The exercise data JSON must include these keys matching the template variables:
 
 Write vocabulary data as JSON, then render and compile:
 ```bash
-python3 scripts/render_latex.py vocabulary.tex.j2 output/<movie-name>/<movie-name>-vocab-data.json output/<movie-name>/<movie-name>-vocabulary.tex
-bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-vocabulary.tex
+python3 scripts/render.py vocabulary.typ.j2 output/<movie-name>/<movie-name>-vocab-data.json output/<movie-name>/<movie-name>-vocabulary.typ
+bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-vocabulary.typ
 ```
 
 The vocabulary data JSON must include:
@@ -238,7 +239,7 @@ The vocabulary data JSON must include:
 
 ### Step 8: Clean Up and Report
 
-Remove temporary data JSON and `.tex` files (keep the guideline JSON and PDFs).
+Remove temporary data JSON and `.typ` files (keep the guideline JSON and PDFs).
 
 Report to the user:
 ```
@@ -253,6 +254,260 @@ Output folder: output/<movie-name>/
 
 Print the exercise, watch the movie, complete it, then scan and run:
   /english-teacher assess output/<movie-name> <your-scan.pdf>
+```
+
+---
+
+## LISTENING MODE
+
+### Input
+- A subtitle file (`.srt` or `.vtt`), whose filename is the movie name
+- `--level` flag with CEFR level: A1, A2, B1, B2, C1, or C2
+- `--model-path` (optional): Path to Qwen3-TTS MLX model (default: `models/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit`)
+- `--tts-mode` (optional): `base`, `design`, or `custom` (default: `custom`)
+
+### Prerequisites Check
+
+Before starting, verify these are installed:
+```bash
+python3 -c "import jinja2; print('jinja2 OK')"
+python3 -c "import mlx_audio; print('mlx_audio OK')"
+xelatex --version | head -1
+```
+If anything is missing, tell the user how to install it and stop.
+
+For mlx_audio:
+```bash
+pip install mlx_audio
+```
+
+For the Qwen3-TTS model, download from [MLX Community on Hugging Face](https://huggingface.co/collections/mlx-community/qwen3-tts):
+- [Qwen3-TTS Base model](https://huggingface.co/mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit) — for voice cloning (needs 3-sec reference audio)
+- [Qwen3-TTS CustomVoice model](https://huggingface.co/mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit) — for pre-defined speakers (Chelsie, Ethan, Vivienne, Ryan)
+- [Qwen3-TTS VoiceDesign model](https://huggingface.co/mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit) — for text-prompt voice design
+
+Download ALL files including the `speech_tokenizer` folder to a `models/` directory.
+
+### Step 1: Parse the Subtitle
+
+```bash
+python3 scripts/parse_subtitle.py <subtitle-file>
+```
+
+Save the output to `output/<movie-name>/scenes.json`.
+
+### Step 2: Check for Existing Guideline
+
+Check if `output/<movie-name>/<movie-name>-guideline.json` exists (from a previous `/generate` command). If it exists, use its vocabulary list as the basis for the listening exercise. If not, proceed with vocabulary selection from the scenes alone.
+
+### Step 3: Select Passages and Design TOEFL-Style Questions
+
+Select 4–6 passages from the scenes JSON. A "passage" is one or more consecutive scenes that form a coherent dialogue. Aim for:
+
+**Part A: Short Conversations** (~3 passages, 1 question each)
+- Short dialogues (2–4 lines) between characters
+- Question types (1 per passage, TOEFL pattern):
+  - **Main idea**: "What is the conversation mainly about?"
+  - **Detail**: "What does the man/woman say about ___?"
+  - **Inference**: "What can be inferred about ___?"
+
+**Part B: Longer Talks** (~3 passages, 2–3 questions each)
+- Longer dialogues or monologues (5–10 lines)
+- Question types (2–3 per passage):
+  - **Main idea**: "What is the main topic of the talk/conversation?"
+  - **Detail**: "According to the speaker, ___?"
+  - **Inference**: "What does the speaker imply about ___?"
+  - **Speaker's purpose**: "Why does the speaker mention ___?"
+  - **Speaker's attitude**: "What is the speaker's attitude toward ___?"
+
+Each question should have 4 choices (A–D) with exactly one correct answer, plus one short answer question per passage.
+
+Adjust difficulty based on the learner's CEFR level:
+- A1–A2: Slower speech, simpler vocabulary, direct questions
+- B1–B2: Moderate speed, inference questions included
+- C1–C2: Natural speed, complex inference and attitude questions
+
+### Step 4: Prepare TTS Input
+
+Create a JSON file at `output/<movie-name>/<movie-name>-tts-passages.json` with the text for each audio track. Structure:
+
+```json
+[
+  {
+    "id": "track_01",
+    "speaker": "Chelsie",
+    "text": "Jack: I'm the king of the world!\nRose: You're crazy!"
+  },
+  {
+    "id": "track_02",
+    "speaker": "Ethan",
+    "text": "Thomas: We need to find a way out of here.\nSarah: I think I saw a door on the other side."
+  }
+]
+```
+
+For dialogues, format each line as `Speaker: dialogue text` so the TTS reads naturally. Use different CustomVoice speakers (Chelsie=female, Ethan=male, Vivienne=female, Ryan=male) to differentiate characters.
+
+For `design` mode, adjust the speaker description to match the character gender/tone.
+
+### Step 5: Generate Audio Files
+
+Run the TTS script to generate audio for each passage:
+
+```bash
+python3 scripts/generate_tts.py \
+  --model-path <model-path> \
+  --mode <tts-mode> \
+  --input-file output/<movie-name>/<movie-name>-tts-passages.json \
+  --output-dir output/<movie-name>/audio \
+  [--speaker-design "female, warm and clear English narrator"] \
+  [--speaker-name Chelsie] \
+  [--speaker-instruct "Read slowly and clearly for a listening exercise."] \
+  --verbose
+```
+
+This produces `output/<movie-name>/audio/track_01.mp3`, `track_02.mp3`, etc.
+
+**Voice mode options:**
+- `custom` (default): Use pre-defined speakers. Good for quick generation.
+- `design`: Describe a voice in natural language. Good for matching movie character tone.
+- `base`: Clone a voice from a 3+ second reference audio. Requires `--ref-audio` and `--ref-text`.
+
+### Step 6: Save Listening Guideline JSON
+
+Write the complete guideline to `output/<movie-name>/<movie-name>-listening-guideline.json`:
+
+```json
+{
+  "movie": "<movie-name>",
+  "detected_cefr": "<detected level>",
+  "learner_cefr": "<specified level>",
+  "generated_date": "<YYYY-MM-DD>",
+  "tts_mode": "<mode>",
+  "model_path": "<model-path>",
+  "audio_tracks": [
+    {
+      "track_number": 1,
+      "id": "track_01",
+      "scene_ref": "scene_14 [00:15:30]",
+      "file": "audio/track_01.mp3"
+    }
+  ],
+  "part_a_passages": [
+    {
+      "id": "A1",
+      "track_number": 1,
+      "scene_ref": "scene_14 [00:15:30]",
+      "context": "Two friends discussing plans",
+      "questions": [
+        {
+          "id": "L1",
+          "type": "multiple_choice",
+          "question_type": "detail",
+          "prompt": "What does the woman suggest they do?",
+          "choices": [
+            {"label": "A", "text": "Go to the park"},
+            {"label": "B", "text": "Watch a movie"},
+            {"label": "C", "text": "Study at home"},
+            {"label": "D", "text": "Visit a museum"}
+          ],
+          "correct_answer": "B",
+          "explanation": "The woman says 'I think we should watch that new movie.'"
+        }
+      ]
+    }
+  ],
+  "part_b_passages": [
+    {
+      "id": "B1",
+      "track_number": 4,
+      "scene_ref": "scene_22 [00:45:00]",
+      "context": "A professor explaining a historical event",
+      "questions": [
+        {
+          "id": "L4",
+          "type": "multiple_choice",
+          "question_type": "main_idea",
+          "prompt": "What is the main topic of the lecture?",
+          "choices": [
+            {"label": "A", "text": "..."},
+            {"label": "B", "text": "..."},
+            {"label": "C", "text": "..."},
+            {"label": "D", "text": "..."}
+          ],
+          "correct_answer": "A",
+          "explanation": "..."
+        },
+        {
+          "id": "L5",
+          "type": "short_answer",
+          "question_type": "inference",
+          "prompt": "Why does the professor mention the book?",
+          "box_height": "3cm",
+          "rubric": {
+            "max_score": 3,
+            "key_points": ["..."],
+            "common_errors": ["..."]
+          }
+        }
+      ]
+    }
+  ],
+  "vocabulary_list": [
+    {
+      "word": "bow",
+      "part_of_speech": "noun",
+      "cefr": "B1",
+      "meaning": "front part of a ship",
+      "movie_example": "\"I'm the king of the world!\" (at the bow)",
+      "real_life_example": "The passengers gathered at the bow to watch the sunset.",
+      "scene_ref": "scene_14 [00:15:30]"
+    }
+  ]
+}
+```
+
+### Step 7: Render Listening Exercise PDF
+
+Write the exercise data as a JSON file, then render and compile:
+
+```bash
+python3 scripts/render.py listening.typ.j2 output/<movie-name>/<movie-name>-listening-data.json output/<movie-name>/<movie-name>-listening.typ
+bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-listening.typ
+```
+
+The listening exercise data JSON must include:
+- `doc_type`: "Listening Exercise"
+- `movie_name`, `cefr_level`, `detected_cefr`, `learner_cefr`, `generated_date`
+- `audio_prefix`: prefix for audio file references (e.g., `<movie-name>`)
+- `total_points`, `total_count`
+- `part_a_points`, `part_a_count`, `part_a_passages` (array of {id, track_number, scene_ref, context?, questions: [{id, points, type, prompt, choices? or box_height?}]})
+- `part_b_points`, `part_b_count`, `part_b_passages` (same structure, with more questions per passage)
+
+### Step 8: Clean Up and Report
+
+Remove temporary data JSON and `.typ` files. Keep the guideline JSON, PDFs, and audio files.
+
+Report to the user:
+```
+Listening exercise generated for: <movie-name>
+Detected movie CEFR: <level>
+Learner level: <level>
+TTS mode: <mode>
+
+Output folder: output/<movie-name>/
+  - <movie-name>-listening.pdf    (X questions, XX points)
+  - <movie-name>-listening-guideline.json  (answer key for assessment)
+  - audio/                         (TTS-generated audio tracks)
+    - track_01.mp3
+    - track_02.mp3
+    - ...
+
+Play the audio tracks while working on the exercise.
+Each track may be replayed up to 2 times.
+
+To assess completed exercises:
+  /english-teacher assess output/<movie-name> <scanned.pdf>
 ```
 
 ---
@@ -332,8 +587,8 @@ Based on the assessment:
 
 Write assessment data as JSON, then render and compile:
 ```bash
-python3 scripts/render_latex.py assessment.tex.j2 output/<movie-name>/<movie-name>-assess-data.json output/<movie-name>/<movie-name>-assessment.tex
-bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-assessment.tex
+python3 scripts/render.py assessment.typ.j2 output/<movie-name>/<movie-name>-assess-data.json output/<movie-name>/<movie-name>-assessment.typ
+bash scripts/compile_pdf.sh output/<movie-name>/<movie-name>-assessment.typ
 ```
 
 The assessment data JSON must include:
@@ -380,15 +635,17 @@ Markdown:    output/<movie-name>/<movie-name>-assessment.md
 
 ---
 
-## LaTeX Style Notes
+## PDF Style Notes
 
 All PDFs use CS188 UC Berkeley exam style:
 - Clean black and white, no colors except score bars in assessment
-- Computer Modern font (LaTeX default)
+- New Computer Modern font (via Typst; legacy: Computer Modern via LaTeX)
 - 3-column footer: Doc Type | Page X of Y | Movie --- CEFR
 - Circular bubbles for multiple choice
 - Bordered boxes for writing areas and feedback
 - Question format: `A1 (2 points) Question text`
+
+Templates are Typst (`.typ.j2`, primary) and LaTeX (`.tex.j2`, legacy fallback).
 
 ## Error Handling
 
@@ -397,7 +654,10 @@ All PDFs use CS188 UC Berkeley exam style:
 - Missing guideline.json: tell learner to run generate first
 - xelatex not installed: provide install instructions
 - docling-mcp not configured: provide setup instructions
+- mlx_audio not installed: provide install instructions (`pip install mlx_audio`)
+- Qwen3-TTS model not downloaded: provide Hugging Face download instructions
 - Subtitle too short (<50 lines): warn that exercise quality may be limited, proceed anyway
+- TTS generation fails: check model path and mode, suggest alternatives
 
 ## Available Tools
 
@@ -409,9 +669,16 @@ When subtitle context is insufficient, use these tools for supplementary researc
 - `exa_web_search_exa` — Quick web search for movie/historical context
 - `exa_web_search_advanced_exa` — Advanced search with filters for detailed research
 
-**LaTeX Rendering:**
-- `python3 scripts/render_latex.py <template.j2> <data.json> <output.tex>` — Render Jinja2 template with data
-- `bash scripts/compile_pdf.sh <file.tex>` — Compile .tex to PDF (runs xelatex twice for page refs)
+**Template Rendering & PDF Compilation:**
+- `python3 scripts/render.py <template.j2> <data.json> <output>` — Render Jinja2 template with data (Typst `.typ.j2` or legacy LaTeX `.tex.j2`)
+- `bash scripts/compile_pdf.sh <file.typ>` — Compile .typ to PDF (uses typst; primary)
+- `bash scripts/compile_pdf.sh <file.tex>` — Compile .tex to PDF (uses xelatex; legacy fallback)
+
+**TTS Audio Generation:**
+- `python3 scripts/generate_tts.py --model-path <path> --mode <base|design|custom> --input-file <passages.json> --output-dir <dir>` — Generate audio from text using Qwen3-TTS via MLX-Audio
+- `python3 scripts/generate_tts.py --model-path <path> --mode <base|design|custom> --input-text <text> --output <file>` — Generate single audio file
+- Voices (custom mode): Chelsie (female), Ethan (male), Vivienne (female), Ryan (male)
+- Requires: mlx_audio (`pip install mlx_audio`), Qwen3-TTS model downloaded to `models/`
 
 **MCP Servers:**
 - docling-mcp — PDF text extraction for assess mode

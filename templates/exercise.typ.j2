@@ -1,0 +1,108 @@
+// exercise.typ.j2 — Exercise PDF (CS188 exam style)
+
+#import "common.typ.j2": *
+
+// ===== COVER PAGE =====
+#page(numbering: none)[
+  #align(left)[
+    #text(size: 20pt, weight: "bold")[English Exercise]\
+    #text(size: 16pt, weight: "bold")[{{ movie_name }}]
+  ]
+  #h(1fr)
+  #align(right)[
+    Movie CEFR: {{ detected_cefr }}\
+    Your Level: {{ learner_cefr }}\
+    Date: {{ generated_date }}
+  ]
+
+  #v(1.5em)
+
+  Print Your Name: #line(length: 8cm, stroke: 0.4pt)
+
+  #v(2em)
+
+  There are 3 parts of varying credit. ({{ total_points }} points total)
+
+  #v(1em)
+
+  #align(center)[
+    #table(
+      columns: (1fr<% for part in parts %>, 1fr<% endfor %>, 1fr),
+      align: center,
+      stroke: 0.5pt,
+      [*Part*]<% for part in parts %>, [*{{ part.label }}*]<% endfor %>, [*Total*],
+      [Points]<% for part in parts %>, [{{ part.points }}]<% endfor %>, [{{ total_points }}],
+    )
+  ]
+
+  #v(1.5em)
+
+  #text(style: "italic")[For questions with circular bubbles, you may select only one choice.]
+
+  #v(0.5em)
+  - #bubble[A] Unselected option (completely unfilled)
+  - #filled-bubble[C] Your selected option (completely filled)
+
+  #v(1em)
+
+  #text(style: "italic")[For subjective questions (Part C), write your answer clearly inside the answer box. Anything written outside the box will not be graded.]
+
+  #v(1em)
+
+  *Part C Question Types:*
+  #v(0.3em)
+  - *Scene Summary* --- Summarize what happens in a specific scene from the movie in your own words.
+  - *Character Analysis* --- Explain what a character meant, what emotions they expressed, or why they acted a certain way.
+  - *Alternative Dialogue* --- Rewrite a scene's dialogue in your own words while keeping the same meaning.
+  - *Vocabulary in Sentences* --- Use given vocabulary words from the movie in your own original sentences.
+
+  #v(1em)
+  #line(length: 100%, stroke: 0.5pt)
+]
+
+#set page(numbering: "1")
+
+// ===== PART A: VOCABULARY (MULTIPLE CHOICE) =====
+= Part A: Vocabulary ({{ part_a_points }} points)
+
+<% for q in part_a_questions %>
+#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+
+#v(0.3em)
+<% for choice in q.choices %>
+- #bubble([{{ choice.label }}]) {{ choice.text | escape_typst }}
+<% endfor %>
+
+#v(1em)
+<% endfor %>
+
+// ===== PART B: COMPREHENSION (MULTIPLE CHOICE) =====
+<% if part_b_needs_newpage %>#pagebreak<% endif %>
+= Part B: Comprehension ({{ part_b_points }} points)
+
+<% for q in part_b_questions %>
+#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+
+#v(0.3em)
+<% for choice in q.choices %>
+- #bubble([{{ choice.label }}]) {{ choice.text | escape_typst }}
+<% endfor %>
+
+#v(1em)
+<% endfor %>
+
+// ===== PART C: SUBJECTIVE WRITING =====
+#pagebreak
+= Part C: Subjective Writing ({{ part_c_points }} points)
+
+<% for q in part_c_questions %>
+#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+
+#v(0.5em)
+#writingbox(height: {{ q.box_height }})
+<% if not loop.last %>
+
+#v(1.5em)
+<% endif %>
+<% if q.needs_newpage %>#pagebreak<% endif %>
+<% endfor %>
