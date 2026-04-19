@@ -53,17 +53,19 @@
 
 #v(0.5em)
 
-#table(
-  columns: (2.2cm, 1.5cm, 3cm, 3.5cm, 3.5cm),
-  align: (left, left, left, left, left),
-  stroke: 0.5pt,
-  table.header(
-    [*Word*], [*POS*], [*Meaning*], [*Movie Example*], [*Real-life Example*],
-  ),
-  <% for word in level.words %>
-  [{{ word.word | escape_typst }}], [{{ word.pos | escape_typst }}], [{{ word.meaning | escape_typst }}], [_{{ word.movie_example | escape_typst }}_], [{{ word.real_life_example | escape_typst }}],
-  <% endfor %>
-)
+#align(center)[
+  #table(
+    columns: (2.2cm, 2.4cm, 3cm, 3.5cm, 3.5cm),
+    align: (left, left, left, left, left),
+    stroke: 0.5pt,
+    table.header(
+      [*Word*], [*POS*], [*Meaning*], [*Movie Example*], [*Real-life Example*],
+    ),
+    <% for word in level.words %>
+    [{{ word.word | escape_typst }}], [{{ word.pos | escape_typst }}], [{{ word.meaning | escape_typst }}], [_{{ word.movie_example | escape_typst }}_], [{{ word.real_life_example | escape_typst }}],
+    <% endfor %>
+  )
+]
 
 <% if not loop.last %>
 #pagebreak()
