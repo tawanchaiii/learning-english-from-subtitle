@@ -39,6 +39,20 @@ import time
 SUPPORTED_MODES = ("base", "design", "custom")
 CUSTOM_VOICES = ("Chelsie", "Ethan", "Vivienne", "Ryan")
 
+# Trailing silence appended to every generated audio clip (seconds).
+# Gives listeners a moment to process the sentence before the clip ends.
+TRAILING_SILENCE_SECONDS = 1.0
+
+
+def _append_trailing_silence(audio, sample_rate):
+    """Concatenate `TRAILING_SILENCE_SECONDS` of zeros onto an mx audio array."""
+    import mlx.core as mx
+
+    silence_shape = list(audio.shape)
+    silence_shape[0] = int(sample_rate * TRAILING_SILENCE_SECONDS)
+    silence = mx.zeros(tuple(silence_shape), dtype=audio.dtype)
+    return mx.concatenate([audio, silence], axis=0)
+
 
 def check_mlx_audio():
     try:
@@ -88,7 +102,8 @@ def generate_design(
             audio.append(result.audio)
 
     if audio:
-        audio_write(output_path, mx.concatenate(audio, axis=0), sample_rate)
+        combined = _append_trailing_silence(mx.concatenate(audio, axis=0), sample_rate)
+        audio_write(output_path, combined, sample_rate)
 
 
 def generate_custom(
@@ -109,7 +124,8 @@ def generate_custom(
             audio.append(result.audio)
 
     if audio:
-        audio_write(output_path, mx.concatenate(audio, axis=0), sample_rate)
+        combined = _append_trailing_silence(mx.concatenate(audio, axis=0), sample_rate)
+        audio_write(output_path, combined, sample_rate)
 
 
 def _move_output(results, output_path):
