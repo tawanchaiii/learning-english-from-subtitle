@@ -66,12 +66,14 @@
 = Part A: Vocabulary ({{ part_a_points }} points)
 
 <% for q in part_a_questions %>
-#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+#block(breakable: false)[
+  #question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
 
-#v(0.3em)
-<% for choice in q.choices %>
-#block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
-<% endfor %>
+  #v(0.3em)
+  <% for choice in q.choices %>
+  #block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
+  <% endfor %>
+]
 
 #v(1em)
 <% endfor %>
@@ -83,12 +85,14 @@
 = Part B: Comprehension ({{ part_b_points }} points)
 
 <% for q in part_b_questions %>
-#question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
+#block(breakable: false)[
+  #question([{{ q.id }}], {{ q.points }}, [{{ q.prompt | escape_typst }}])
 
-#v(0.3em)
-<% for choice in q.choices %>
-#block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
-<% endfor %>
+  #v(0.3em)
+  <% for choice in q.choices %>
+  #block(below: 0.5em)[#bubble([{{ choice.label }}]) #h(0.3em) {{ choice.text | escape_typst }}]
+  <% endfor %>
+]
 
 #v(1em)
 <% endfor %>
